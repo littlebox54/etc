@@ -1,0 +1,13 @@
+/var/log/fail2ban.log {
+   
+    weekly
+    rotate 4
+    compress
+
+    delaycompress
+    missingok
+    postrotate
+	fail2ban-client set logtarget /var/log/fail2ban.log >/dev/null
+    endscript
+    create 640 root adm
+}

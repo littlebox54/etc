@@ -1,0 +1,10 @@
+/var/log/polipo/polipo.log {
+        create 644 proxy proxy
+        rotate 7
+        compress
+        daily
+        postrotate
+		PIDFILE=/var/run/polipo/polipo.pid
+		if [ -f "$PIDFILE" ] ; then kill -USR1 $(cat "$PIDFILE") ; fi
+        endscript
+}

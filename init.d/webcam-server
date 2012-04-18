@@ -1,0 +1,48 @@
+#!/bin/sh
+
+SERVER_BIN=webcam-server
+LOCK_FILE=/var/lock/$SERVER_BIN
+RTRN=0
+# OPTIONS='-v -g 320x240 -p 8888 -c berger21.net'
+OPTIONS='-v -g 320x240 -p 8888'
+
+start() {
+
+[ -f $LOCK_FILE ] && echo "$SERVER_BIN already started"
+[ -f $LOCK_FILE ] && return
+
+echo -n "Starting $SERVER_BIN: "
+export LD_PRELOAD=/usr/lib/libv4l/v4l1compat.so
+nohup $SERVER_BIN $OPTIONS > /dev/null 2>/dev/null &
+RTRN=$?
+[ $RTRN -eq 0 ] && echo Started! || echo FAIL
+[ $RTRN -eq 0 ] && touch $LOCK_FILE
+}
+
+stop() {
+[ -f $LOCK_FILE ] || echo "$SERVER_BIN is not running"
+[ -f $LOCK_FILE ] || return
+echo -n "Stopping $SERVER_BIN: "
+pkill -f "$SERVER_BIN $OPTIONS"
+RTRN=$?
+rm -f $LOCK_FILE
+[ $RTRN -eq 0 ] && echo Stopped! || echo FAIL
+}
+
+case "$1" in
+start)
+start
+;;
+stop)
+stop
+;;
+restart)
+stop
+start
+;;
+*)
+echo "Usage: $0 {start|stop|restart}"
+RTRN=1
+esac
+
+exit $RTRN
